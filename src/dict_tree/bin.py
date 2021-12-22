@@ -3,10 +3,19 @@ from collections import OrderedDict, namedtuple
 import enum
 import math
 from types import ModuleType
-from typing import Callable, Union, Generator, List, Dict
+from typing import Callable, Union, Generator, List, Dict, Iterable
 
 import dict_tree.boxes as boxes
 import dict_tree.exceptions as exceptions
+
+NON_VALUE_TYPES = (
+                    dict,
+                    list,
+                    tuple,
+                    # Generator,
+                    # type,
+                    # ModuleType,
+                )
 
 DICTIONARY_TREELINE_TEMPLATE = OrderedDict(
     {
@@ -16,14 +25,7 @@ DICTIONARY_TREELINE_TEMPLATE = OrderedDict(
             lambda obj: str(obj) if (
                 not isinstance(
                     obj,
-                    (
-                        dict,
-                        list,
-                        tuple,
-                        Generator,
-                        type,
-                        ModuleType,
-                    )
+                    NON_VALUE_TYPES
                 )
             ) else "",
     }
@@ -36,6 +38,14 @@ GUESS_NAME_BY_TYPE = OrderedDict(
         "default":lambda obj: f"Instance of [{type(obj).__name__}] at address [0x{id(obj):x}]",
     }
 )
+
+IGNORE_STANDARD_TYPES = (
+    type,
+    ModuleType,
+)
+
+IGNORE_NO_TYPES = tuple()
+
 
 class LineType(enum.Enum):
     INDENT_ONLY = enum.auto()
@@ -60,6 +70,7 @@ class DictionaryTree():
         name:str="",
         box:boxes.Box=boxes.ThinBox,
         indent:int=6,
+        ignore_types:Iterable[type]=IGNORE_STANDARD_TYPES,
         echo:bool=True,
     ):
         self.reset_lines()
@@ -68,6 +79,7 @@ class DictionaryTree():
             name=name,
             box=box,
             indent=indent,
+            ignore_types=ignore_types,
         )
 
         if (echo):
@@ -108,7 +120,8 @@ class DictionaryTree():
         is_last_item:bool=True,
         layers:tuple=(),
         indent:int=6,
-    ):
+        ignore_types:Iterable[type]=IGNORE_STANDARD_TYPES,
+    )->None:
 
         # Work out a name if its the base object with no name
         if (not(name) and not(layers)):
@@ -122,18 +135,38 @@ class DictionaryTree():
         # ============================================================================================================
         # Treat as DICT
         if (
-            isinstance(obj, dict) or \
-            hasattr(obj, "__dict__")
+            (
+                isinstance(obj, dict) or \
+                hasattr(obj, "__dict__") or \
+                (
+                    isinstance(obj, tuple) and \
+                    hasattr(obj, "_fields") and \
+                    hasattr(obj, "_asdict")         # collections.namedtuple
+                )
+            ) and not (
+                # Print as scalar if:
+                #   either
+                #       This is the root object or
+                #       The object is in ignore_types
+                isinstance(obj, ignore_types) and \
+                layers
+            )
         ):
 
-            _dict = obj if (isinstance(obj, dict)) else obj.__dict__
+            if (isinstance(obj, dict)) :
+                _dict = obj
+            # collections.namedtuple; see if statement above.
+            elif (isinstance(obj, tuple)):
+                _dict = obj._asdict()
+            else:
+                _dict = obj.__dict__
 
             self.add_line(
                 self.build_line(
                     obj=obj,
                     name=str(name),
                     box=box,
-                    line_type=LineType.TREE_BRANCH_BOTTOM,
+                    line_type=LineType.TREE_BRANCH_BOTTOM if (len(_dict)>0) else LineType.SCALAR,
                     is_last_item=is_last_item,
                     layers=layers,
                     indent=indent,
@@ -160,7 +193,15 @@ class DictionaryTree():
                 list,
                 tuple,
                 Generator
-            ))
+                )
+            ) and not (
+                # Print as scalar if:
+                #   either
+                #       This is the root object or
+                #       The object is in ignore_types
+                isinstance(obj, ignore_types) and \
+                layers
+            )
         ):  
 
             # Make a copy of the object before listing - prevents Generator from being consumed
@@ -171,7 +212,7 @@ class DictionaryTree():
                     obj=copy(obj),
                     name=str(name),
                     box=box,
-                    line_type=LineType.TREE_BRANCH_BOTTOM,
+                    line_type=LineType.TREE_BRANCH_BOTTOM if (len(_list)>0) else LineType.SCALAR,
                     is_last_item=is_last_item,
                     layers=layers,
                     indent=indent,
@@ -221,7 +262,7 @@ class DictionaryTree():
         is_last_item:bool=False,
         layers:tuple=(),
         indent:int=6,
-    ):
+    )->TreeLine:
         BOX_SPACE               = box.BOX_SPACE.value
         BOX_HORIZONTAL          = box.BOX_HORIZONTAL.value
         BOX_VERTICAL            = box.BOX_VERTICAL.value
@@ -274,7 +315,7 @@ class DictionaryTree():
     def add_line(
         self,
         line,
-    ):
+    )->None:
         if (isinstance(line, self.TreeLine)):
             self.line_buffer.append(line)
             self.max_lengths["name"] = max(
@@ -292,7 +333,7 @@ class DictionaryTree():
         self,
         box:boxes.Box=boxes.ThinBox,
         echo:bool=False,
-    ):
+    )->str:
         _lines = []
 
         LINE_BREAK = box.LINE_BREAK.value
