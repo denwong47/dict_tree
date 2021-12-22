@@ -69,10 +69,12 @@ class DictionaryTree():
             box=box,
             indent=indent,
         )
-        self.render(
-            box=box,
-            echo=echo
-        )
+
+        if (echo):
+            self.render(
+                box=box,
+                echo=echo,
+            )
 
     def reset_lines(
         self,
@@ -289,7 +291,7 @@ class DictionaryTree():
     def render(
         self,
         box:boxes.Box=boxes.ThinBox,
-        echo:bool=True,
+        echo:bool=False,
     ):
         _lines = []
 
@@ -340,56 +342,6 @@ class DictionaryTree():
 
 if __name__=="__main__":
     _sample_dict = [
-        {
-            "name": "pkm_familie",
-            "type": "INTEGER",
-            "mode": "NULLABLE"
-        },
-        {
-            "name": "b_neuheit",
-            "type": "BOOLEAN",
-            "mode": "NULLABLE"
-        },
-        {
-            "name": "s_familie",
-            "type": "STRING",
-            "mode": "NULLABLE"
-        },
-        {
-            "name": "u_ugr",
-            "type": "FLOAT",
-            "mode": "NULLABLE"
-        },
-        {
-            "name": "led_module",
-            "type": "STRING",
-            "mode": "NULLABLE"
-        },
-        {
-            "name": "s_farbe_kombifeld_indirekt",
-            "type": "STRING",
-            "mode": "NULLABLE"
-        },
-        {
-            "name": "s_abblendraster",
-            "type": "STRING",
-            "mode": "NULLABLE"
-        },
-        {
-            "name": "s_control",
-            "type": "STRING",
-            "mode": "NULLABLE"
-        },
-        {
-            "name": "s_baugroesse_list_display_string",
-            "type": "STRING",
-            "mode": "NULLABLE"
-        },
-        {
-            "name": "u_beleuchtungsstaerke_dl_sym_raster",
-            "type": "FLOAT",
-            "mode": "NULLABLE"
-        },
         {
             "name": "power_singlefield_with_unit",
             "type": "STRING",
@@ -444,67 +396,11 @@ if __name__=="__main__":
             "type": "STRING",
             "mode": "NULLABLE"
         },
-        {
-            "name": "s_artikelbild",
-            "type": "STRING",
-            "mode": "NULLABLE"
-        },
-        {
-            "name": "s_leuchtenlichtstrom_display_unit",
-            "type": "STRING",
-            "mode": "NULLABLE"
-        },
-        {
-            "name": "lumens_with_unit",
-            "type": "STRING",
-            "mode": "NULLABLE"
-        },
-        {
-            "name": "artno_schoen",
-            "type": "STRING",
-            "mode": "NULLABLE"
-        },
-        {
-            "name": "pkm_artikel",
-            "type": "STRING",
-            "mode": "NULLABLE"
-        },
-        {
-            "name": "s_einbaudetail",
-            "type": "FLOAT",
-            "mode": "NULLABLE"
-        },
-        {
-            "name": "s_untertitel",
-            "type": "STRING",
-            "mode": "NULLABLE"
-        },
-        {
-            "name": "s_gehaeusefarbe",
-            "type": "STRING",
-            "mode": "NULLABLE"
-        },
-        {
-            "name": "s_leistung_display_unit",
-            "type": "STRING",
-            "mode": "NULLABLE"
-        },
-        {
-            "name": "s_lichtwerkzeug",
-            "type": "STRING",
-            "mode": "NULLABLE"
-        },
-        {
-            "name": "s_lichtaustritt",
-            "type": "STRING",
-            "mode": "NULLABLE"
-        },
-        {
-            "name": "product_image",
-            "type": "STRING",
-            "mode": "NULLABLE"
-        }
+
     ]
-    DictionaryTree(_sample_dict, echo=True)
+    _dict_tree = DictionaryTree(_sample_dict, echo=False, box=boxes.ThickBox)
+
+    print (_dict_tree)
+    
     # DictionaryTree(math, echo=True, box=boxes.DoubleBox)
 
