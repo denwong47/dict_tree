@@ -1,5 +1,5 @@
 # dict_tree
- A simple class to manage temporary Environment Variables as a context manager.
+ Contains the DictionaryTree class which can display dict, list or similar objects in a vertical tree.
 
  ## dict_tree.DictionaryTree()
  ## Syntax:
@@ -10,6 +10,7 @@
      box:dict_tree.boxes.Box=dict_tree.boxes.ThinBox,
      indent:int=6,
      echo:bool=True,
+     ignore_types:tuple=(type, typing.ModuleType),
  )
 
  ```
@@ -28,6 +29,7 @@
 
  If `echo` is `True`, the tree is immediately printed to `stdout`. Otherwise, you can call `str()` on an instance of `DictionaryTree` which will return the tree in `str`.
 
+ `ignore_types` is a tuple; all type objects in `ignore_types` will not be expanded as dicts or lists. By default all type/class objects and ModuleTypes are ignored.
 
  Sample obj:
  ```
