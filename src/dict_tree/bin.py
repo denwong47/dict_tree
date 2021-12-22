@@ -130,7 +130,7 @@ class DictionaryTree():
 
             self.add_line(
                 self.build_line(
-                    obj=_dict,
+                    obj=obj,
                     name=str(name),
                     box=box,
                     line_type=LineType.TREE_BRANCH_BOTTOM,
@@ -168,7 +168,7 @@ class DictionaryTree():
 
             self.add_line(
                 self.build_line(
-                    obj=_list,
+                    obj=copy(obj),
                     name=str(name),
                     box=box,
                     line_type=LineType.TREE_BRANCH_BOTTOM,
