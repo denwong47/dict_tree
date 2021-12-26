@@ -137,7 +137,10 @@ class DictionaryTree():
         if (
             (
                 isinstance(obj, dict) or \
-                hasattr(obj, "__dict__") or \
+                (
+                    hasattr(obj, "__dict__") and \
+                    not isinstance(obj, (list, tuple)) # Weirdly if you subclass a tuple without adding anything, __dict__ will now exist in its instances. We have to make sure that any tuples that goes through are namedtuples only.
+                ) or \
                 (
                     isinstance(obj, tuple) and \
                     hasattr(obj, "_fields") and \
@@ -439,7 +442,7 @@ if __name__=="__main__":
         },
 
     ]
-    _dict_tree = DictionaryTree(_sample_dict, echo=False, box=boxes.ThickBox)
+    _dict_tree = DictionaryTree(_sample_dict, echo=False, box=boxes.ThickBox,)
 
     print (_dict_tree)
     
