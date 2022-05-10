@@ -3,7 +3,7 @@
 
  ## dict_tree.DictionaryTree()
  ## Syntax:
- ```
+ ```python
  dict_tree.DictionaryTree(
      obj,
      name:str="",
@@ -32,7 +32,7 @@
  `ignore_types` is a tuple; all type objects in `ignore_types` will not be expanded as dicts or lists. By default all type/class objects and ModuleTypes are ignored.
 
  Sample obj:
- ```
+ ```json
     [
         {
             "name": "power_singlefield_with_unit",
